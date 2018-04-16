@@ -5,8 +5,8 @@ import (
 )
 
 func TestGenerateHash(t *testing.T) {
-	testcases := []struct{
-		Value interface{}
+	testcases := []struct {
+		Value    interface{}
 		Expected uint64
 	}{
 		{"HelloWorld", 17863347649006167745},

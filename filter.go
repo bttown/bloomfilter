@@ -1,8 +1,13 @@
 package bloomfilter
 
+import (
+	"sync"
+)
+
 type Filter struct {
-	bitMap []uint8
+	bitMap  []uint8
 	bitSize int64
+	rw      sync.RWMutex
 }
 
 const numHashFunctions = 5
@@ -10,7 +15,7 @@ const numHashFunctions = 5
 func New(bitSize int64) *Filter {
 	filter := Filter{
 		bitSize: bitSize,
-		bitMap: make([]uint8, bitSize),
+		bitMap:  make([]uint8, bitSize),
 	}
 
 	return &filter
@@ -20,8 +25,11 @@ func (filter *Filter) Put(v interface{}) {
 	var hash1 = hash(v)
 	var hash2 = hash1 << 32
 
+	filter.rw.Lock()
+	defer filter.rw.Unlock()
+
 	for i := 1; i < numHashFunctions; i++ {
-		nextHash := hash1 + uint64(i) * hash2
+		nextHash := hash1 + uint64(i)*hash2
 		if nextHash < 0 {
 			nextHash = -nextHash
 		}
@@ -35,8 +43,11 @@ func (filter *Filter) MightContains(v interface{}) bool {
 	var hash1 = hash(v)
 	var hash2 = hash1 << 32
 
+	filter.rw.RLock()
+	defer filter.rw.RUnlock()
+
 	for i := 1; i < numHashFunctions; i++ {
-		nextHash := hash1 + uint64(i) * hash2
+		nextHash := hash1 + uint64(i)*hash2
 		if nextHash < 0 {
 			nextHash = -nextHash
 		}

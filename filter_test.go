@@ -1,6 +1,5 @@
 package bloomfilter
 
-
 import (
 	"testing"
 )
@@ -35,7 +34,7 @@ func TestFilterContains(t *testing.T) {
 		filter.Put(text)
 		s := text + "!"
 		if filter.MightContains(s) {
-			t.Errorf("not Put %s to the filter, but just find it!",s)
+			t.Errorf("not Put %s to the filter, but just find it!", s)
 		}
 	}
 }
